@@ -38,6 +38,9 @@ jobs:
          echo state: ${{ steps.wait-for-status.outputs.state }}
          echo description: ${{ steps.wait-for-status.outputs.description }}
          echo target_url: ${{ steps.wait-for-status.outputs.target_url }}  
+      - name: Fail Test
+        if: steps.wait-for-status.outputs.state != 'success'
+        run: exit 1
 
   addTestStatus: # Delay and then add the expected test Commit status to support the test job
     runs-on: ubuntu-latest
@@ -52,4 +55,19 @@ jobs:
         run: sleep 12
       - name: Create Expected Commit Status
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/statuses/${{ env.test-sha }} -d '{"context":"Test - Test Commit Status", "state":"success", "description":"Test Commit Status Description", "target_url":"http://localhost:3000"}'   
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/statuses/${{ env.test-sha }} -d '{"context":"Test - Test Commit Status", "state":"success", "description":"Test Commit Status Description", "target_url":"http://localhost:3000"}'  
+
+  timeOutTest: # Make sure the Action times out after the configured timeoutSeconds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run the current build of the action
+        id: wait-for-status
+        uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          statusName: "Test - Expected Timeout"
+          timeoutSeconds: 30
+      - name: Fail Test
+        if: steps.wait-for-status.outputs.state != 'timed_out'
+        run: exit 1
