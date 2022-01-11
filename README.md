@@ -10,21 +10,22 @@ A Github Action that allows you to wait for a Commit status to complete before c
 ```yaml
     steps:
       - uses: autotelic/action-wait-for-status-check@feat/initial-implementation
+        id: wait-for-status
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           statusName: "An Expected Commit Status Context"
 
       - name: Do something with a passing status
-        if: steps.wait-for-results.outputs.state == 'success'
+        if: steps.wait-for-status.outputs.state == 'success'
 
       - name: Do something with a failing status
-        if: steps.wait-for-results.outputs.state == 'failure'
+        if: steps.wait-for-status.outputs.state == 'failure'
   
       - name: Echo Outputs
         run: |
-         echo ${{ steps.wait-for-results.outputs.state }}
-         echo ${{ steps.wait-for-results.outputs.description }}
-         echo ${{ steps.wait-for-results.outputs.target_url }}  
+         echo ${{ steps.wait-for-status.outputs.state }}
+         echo ${{ steps.wait-for-status.outputs.description }}
+         echo ${{ steps.wait-for-status.outputs.target_url }}  
 ```
 
 ## Inputs
