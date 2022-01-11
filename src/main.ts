@@ -1,18 +1,34 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import github from '@actions/github'
+import {poll} from './poll'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const context = github.context
+    const token = core.getInput('token', {required: true})
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const {state, description, target_url} = await poll({
+      client: github.getOctokit(token),
+      log: msg => core.info(msg),
 
-    core.setOutput('time', new Date().toTimeString())
+      statusName: core.getInput('statusName', {required: true}),
+      owner: core.getInput('owner') || context.repo.owner,
+      repo: core.getInput('repo') || context.repo.repo,
+      ref: core.getInput('ref') || context.sha,
+
+      timeoutSeconds: parseInt(core.getInput('timeoutSeconds') || '600'),
+      intervalSeconds: parseInt(core.getInput('intervalSeconds') || '10')
+    })
+
+    if (state) core.setOutput('state', state)
+    if (description) core.setOutput('description', description)
+    if (target_url) core.setOutput('target_url', target_url)
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed('Unknown Error')
+    }
   }
 }
 
