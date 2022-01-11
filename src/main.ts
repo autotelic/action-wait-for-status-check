@@ -4,9 +4,7 @@ import {poll} from './poll'
 
 async function run(): Promise<void> {
   try {
-    core.info('test log')
     const context = github.context
-    core.info(JSON.stringify(context))
 
     const token = core.getInput('token', {required: true})
 

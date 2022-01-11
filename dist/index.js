@@ -41,9 +41,7 @@ const poll_1 = __nccwpck_require__(5498);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.info('test log');
             const context = github.context;
-            core.info(JSON.stringify(context));
             const token = core.getInput('token', { required: true });
             const { state, description, target_url } = yield (0, poll_1.poll)({
                 client: github.getOctokit(token),
