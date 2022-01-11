@@ -34,20 +34,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github_1 = __importDefault(__nccwpck_require__(5438));
+const github = __importStar(__nccwpck_require__(5438));
 const poll_1 = __nccwpck_require__(5498);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const context = github_1.default.context;
+            core.info('test log');
+            const context = github.context;
+            core.info(JSON.stringify(context));
             const token = core.getInput('token', { required: true });
             const { state, description, target_url } = yield (0, poll_1.poll)({
-                client: github_1.default.getOctokit(token),
+                client: github.getOctokit(token),
                 log: msg => core.info(msg),
                 statusName: core.getInput('statusName', { required: true }),
                 owner: core.getInput('owner') || context.repo.owner,

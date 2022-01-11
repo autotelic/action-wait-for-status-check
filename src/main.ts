@@ -1,10 +1,13 @@
 import * as core from '@actions/core'
-import github from '@actions/github'
+import * as github from '@actions/github'
 import {poll} from './poll'
 
 async function run(): Promise<void> {
   try {
+    core.info('test log')
     const context = github.context
+    core.info(JSON.stringify(context))
+
     const token = core.getInput('token', {required: true})
 
     const {state, description, target_url} = await poll({
