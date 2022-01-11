@@ -14,8 +14,9 @@ export interface Options {
 }
 
 interface CommitStatusValues {
+  context?: string
   state?: string
-  description?: string
+  description?: string | null
   target_url?: string
 }
 
@@ -37,15 +38,17 @@ export const poll = async (options: Options): Promise<CommitStatusValues> => {
   while (now <= deadline) {
     log(`Retrieving commit statuses on ${owner}/${repo}@${ref}...`)
 
-    const statuses = await client.rest.repos.listCommitStatusesForRef({
+    const {
+      data: {statuses}
+    } = await client.rest.repos.getCombinedStatusForRef({
       owner,
       repo,
       ref
     })
 
-    log(`Retrieved ${statuses.data.length} commit statuses`)
+    log(`Retrieved ${statuses.length} commit statuses`)
 
-    const completedCommitStatus = statuses.data.find(
+    const completedCommitStatus = statuses.find(
       commitStatus =>
         commitStatus.context === statusName && commitStatus.state !== 'pending'
     )
@@ -54,6 +57,7 @@ export const poll = async (options: Options): Promise<CommitStatusValues> => {
         `Found a completed commit status with id ${completedCommitStatus.id} and conclusion ${completedCommitStatus.state}`
       )
       return {
+        context: completedCommitStatus.context,
         state: completedCommitStatus.state,
         description: completedCommitStatus.description,
         target_url: completedCommitStatus.target_url

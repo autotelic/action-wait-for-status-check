@@ -43,7 +43,7 @@ function run() {
         try {
             const context = github.context;
             const token = core.getInput('token', { required: true });
-            const { state, description, target_url } = yield (0, poll_1.poll)({
+            const { context: statusContext, state, description, target_url } = yield (0, poll_1.poll)({
                 client: github.getOctokit(token),
                 log: msg => core.info(msg),
                 statusName: core.getInput('statusName', { required: true }),
@@ -53,6 +53,8 @@ function run() {
                 timeoutSeconds: parseInt(core.getInput('timeoutSeconds') || '600'),
                 intervalSeconds: parseInt(core.getInput('intervalSeconds') || '10')
             });
+            if (statusContext)
+                core.setOutput('context', statusContext);
             if (state)
                 core.setOutput('state', state);
             if (description)
@@ -98,16 +100,17 @@ const poll = (options) => __awaiter(void 0, void 0, void 0, function* () {
     const deadline = now + timeoutSeconds * 1000;
     while (now <= deadline) {
         log(`Retrieving commit statuses on ${owner}/${repo}@${ref}...`);
-        const statuses = yield client.rest.repos.listCommitStatusesForRef({
+        const { data: { statuses } } = yield client.rest.repos.getCombinedStatusForRef({
             owner,
             repo,
             ref
         });
-        log(`Retrieved ${statuses.data.length} commit statuses`);
-        const completedCommitStatus = statuses.data.find(commitStatus => commitStatus.context === statusName && commitStatus.state !== 'pending');
+        log(`Retrieved ${statuses.length} commit statuses`);
+        const completedCommitStatus = statuses.find(commitStatus => commitStatus.context === statusName && commitStatus.state !== 'pending');
         if (completedCommitStatus) {
             log(`Found a completed commit status with id ${completedCommitStatus.id} and conclusion ${completedCommitStatus.state}`);
             return {
+                context: completedCommitStatus.context,
                 state: completedCommitStatus.state,
                 description: completedCommitStatus.description,
                 target_url: completedCommitStatus.target_url

@@ -8,7 +8,12 @@ async function run(): Promise<void> {
 
     const token = core.getInput('token', {required: true})
 
-    const {state, description, target_url} = await poll({
+    const {
+      context: statusContext,
+      state,
+      description,
+      target_url
+    } = await poll({
       client: github.getOctokit(token),
       log: msg => core.info(msg),
 
@@ -21,6 +26,7 @@ async function run(): Promise<void> {
       intervalSeconds: parseInt(core.getInput('intervalSeconds') || '10')
     })
 
+    if (statusContext) core.setOutput('context', statusContext)
     if (state) core.setOutput('state', state)
     if (description) core.setOutput('description', description)
     if (target_url) core.setOutput('target_url', target_url)
