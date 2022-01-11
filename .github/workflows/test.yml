@@ -35,6 +35,7 @@ jobs:
           ref: ${{ env.test-sha }}
       - name: Echo Outputs
         run: |
+         echo context: ${{ steps.wait-for-status.outputs.context }}
          echo state: ${{ steps.wait-for-status.outputs.state }}
          echo description: ${{ steps.wait-for-status.outputs.description }}
          echo target_url: ${{ steps.wait-for-status.outputs.target_url }}  
