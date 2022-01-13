@@ -135,20 +135,61 @@ $ npm test
 
 ## Publish to a distribution branch
 
-TODO
-
-Actions are run from GitHub repos so the `/dist` folder must be checked in.
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
+Action versioning workflow is based on recommendations from the Github Actions Toolkit
 
 See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
+
+### Minor/Patch versions
+
+On branch `main`:
+
+- Increment Package version and push tags
+  ```sh
+    $ npm version [minor/patch]
+    $ git push origin v1.1.3
+  ```
+- Create a GitHub release for each specific version
+- Publish the specific version to the marketplace
+- **Move** Current major version tag to new minor/patch version commit
+  ```sh
+    $ git tag -fa v1 -m "Update v1 tag"
+    $ git push origin v1 --force
+  ```
+
+### Major Versions
+On branch `main`:
+
+- Increment Package version and push tags
+  ```sh
+    $ npm version major
+    $ git push origin v2.0.0
+  ```
+- Create a GitHub release for each specific version
+- Publish the specific version to the marketplace
+- **Create** a new major version tag on the same commit
+  ```sh
+    $ git tag -a v2 -m "Create v2 Major tag"
+    $ git push origin v2
+  ```
+
+### Adding Patches to prior Major Versions
+
+- Checkout the prior major version to a new release branch
+  ```sh
+    $ git checkout -b releases/v1 v1
+    Switched to a new branch 'releases/v1'
+  ```
+- Make necessary patch changes and push the new releases branch to the remote
+- Increment Package version and push tags
+  ```sh
+    $ npm version [minor/patch]
+    $ git push origin v1.1.4
+  ```
+- Create a GitHub release for each specific version
+- Publish the specific version to the marketplace
+- **Move** prior major version tag to the new minor/patch version commit
+  ```sh
+    $ git tag -fa v1 -m "Update v1 tag"
+    $ git push origin v1 --force
+  ```
+  
