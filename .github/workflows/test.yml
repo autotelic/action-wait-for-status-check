@@ -1,10 +1,10 @@
-name: 'build-test'
+name: "build-test"
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
     branches:
       - main
-      - 'releases/*'
+      - "releases/*"
 
 jobs:
   build: # make sure build/ci work properly
@@ -15,10 +15,60 @@ jobs:
           npm install
       - run: |
           npm run all
+  
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - name: Set Commit Sha for Pull Request Event test
+        if: github.event_name == 'pull_request'
+        run: echo "test-sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+      - name: Set Commit Sha for Push Event test
+        if: github.event_name == 'push'
+        run: echo "test-sha=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Run the current build of the action
+        id: wait-for-status
+        uses: ./
         with:
-          milliseconds: 1000
+          token: ${{ secrets.GITHUB_TOKEN }}
+          statusName: "Test - Test Commit Status"
+          ref: ${{ env.test-sha }}
+      - name: Echo Outputs
+        run: |
+         echo context: ${{ steps.wait-for-status.outputs.context }}
+         echo state: ${{ steps.wait-for-status.outputs.state }}
+         echo description: ${{ steps.wait-for-status.outputs.description }}
+         echo target_url: ${{ steps.wait-for-status.outputs.target_url }}  
+      - name: Fail Test
+        if: steps.wait-for-status.outputs.state != 'success'
+        run: exit 1
+
+  addTestStatus: # Delay and then add the expected test Commit status to support the test job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Commit Sha for Pull Request Event test
+        if: github.event_name == 'pull_request'
+        run: echo "test-sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+      - name: Set Commit Sha for Push Event test
+        if: github.event_name == 'push'
+        run: echo "test-sha=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Wait for action to attempt polling for a test commit status
+        run: sleep 12
+      - name: Create Expected Commit Status
+        run: |
+          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/statuses/${{ env.test-sha }} -d '{"context":"Test - Test Commit Status", "state":"success", "description":"Test Commit Status Description", "target_url":"http://localhost:3000"}'  
+
+  timeOutTest: # Make sure the Action times out after the configured timeoutSeconds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run the current build of the action
+        id: wait-for-status
+        uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          statusName: "Test - Expected Timeout"
+          timeoutSeconds: 30
+      - name: Fail Test
+        if: steps.wait-for-status.outputs.state != 'timed_out'
+        run: exit 1

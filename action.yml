@@ -1,11 +1,33 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "Wait For Github Status Check"
+description: "Wait for a specific GitHub status check to complete"
+author: "Autotelic"
+branding:
+  icon: "check-circle"
+  color: "green"
 inputs:
-  milliseconds: # change this
+  token:
+    description: "The GitHub token to use for making API requests."
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  statusName:
+    description: "The name of the GitHub status check to wait for. For example, `build` or `deploy`."
+    required: true
+  ref:
+    description: "The Git ref of the commit you want to poll for a passing status check."
+    required: false
+  repo:
+    description: "The name of the GitHub repository you want to poll for a passing status check."
+    required: false
+  owner:
+    description: "The owner of the GitHub repository you want to poll for a passing status check."
+    required: false
+  timeoutSeconds:
+    description: "The number of seconds to wait for the status check to complete."
+    required: false
+    default: "600"
+  intervalSeconds:
+    description: "The number of seconds to wait before each poll of the GitHub API."
+    required: false
+    default: "10"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
