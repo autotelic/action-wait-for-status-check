@@ -48,13 +48,13 @@ The GitHub token to use for making API requests. Typically, this would be set to
 
 ### statusName
 
-***Required**
+**Required**
 
 The name of the GitHub status check to wait for. For example, `build` or `deploy`.
 
 ### ref
 
-***Optional**
+**Optional**
 
 The Git ref of the commit you want to poll for a passing status check.
 
@@ -64,7 +64,7 @@ Note: If working with a Pull Request Event, you may want to use the `github.pull
 
 ### repo
 
-***Optional**
+**Optional**
 
 The name of the GitHub repository you want to poll for a passing status check.
 
@@ -72,7 +72,7 @@ The name of the GitHub repository you want to poll for a passing status check.
 
 ### owner
 
-***Optional**
+**Optional**
 
 The owner of the GitHub repository you want to poll for a passing status check.
 
@@ -80,7 +80,7 @@ The owner of the GitHub repository you want to poll for a passing status check.
 
 ### timeoutSeconds
 
-***Optional**
+**Optional**
 
 The number of seconds to wait for the status check to complete.
 
@@ -88,7 +88,7 @@ The number of seconds to wait for the status check to complete.
 
 ### intervalSeconds
 
-***Optional**
+**Optional**
 
 The number of seconds to wait before each poll of the GitHub API.
 
@@ -133,7 +133,7 @@ $ npm test
 ...
 ```
 
-## Publish to a distribution branch
+## Action Versioning and Releases
 
 Action versioning workflow is based on recommendations from the Github Actions Toolkit
 
@@ -192,4 +192,3 @@ On branch `main`:
     $ git tag -fa v1 -m "Update v1 tag"
     $ git push origin v1 --force
   ```
-  
