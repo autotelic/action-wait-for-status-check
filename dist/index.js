@@ -101,6 +101,7 @@ const poll = (options) => __awaiter(void 0, void 0, void 0, function* () {
     const deadline = now + timeoutSeconds * 1000;
     while (now <= deadline) {
         log(`Retrieving commit statuses on ${owner}/${repo}@${ref}...`);
+        // https://docs.github.com/en/rest/reference/commits#get-the-combined-status-for-a-specific-reference
         const { data: { statuses } } = yield client.rest.repos.getCombinedStatusForRef({
             owner,
             repo,
@@ -139,12 +140,10 @@ exports.poll = poll;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSha = void 0;
 const resolveSha = (context) => {
-    var _a, _b, _c;
-    let sha = context.sha;
-    if (context.eventName === 'pull_request') {
-        sha = (_c = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.head) === null || _c === void 0 ? void 0 : _c.sha;
-    }
-    return sha;
+    var _a;
+    return context.eventName === 'pull_request'
+        ? ((_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.sha) || context.sha
+        : context.sha;
 };
 exports.resolveSha = resolveSha;
 

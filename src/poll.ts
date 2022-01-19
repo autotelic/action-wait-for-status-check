@@ -38,6 +38,7 @@ export const poll = async (options: Options): Promise<CommitStatusValues> => {
   while (now <= deadline) {
     log(`Retrieving commit statuses on ${owner}/${repo}@${ref}...`)
 
+    // https://docs.github.com/en/rest/reference/commits#get-the-combined-status-for-a-specific-reference
     const {
       data: {statuses}
     } = await client.rest.repos.getCombinedStatusForRef({
