@@ -38,6 +38,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const poll_1 = __nccwpck_require__(5498);
+const resolve_sha_1 = __nccwpck_require__(4235);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -49,7 +50,7 @@ function run() {
                 statusName: core.getInput('statusName', { required: true }),
                 owner: core.getInput('owner') || context.repo.owner,
                 repo: core.getInput('repo') || context.repo.repo,
-                ref: core.getInput('ref') || context.sha,
+                ref: core.getInput('ref') || (0, resolve_sha_1.resolveSha)(context),
                 timeoutSeconds: parseInt(core.getInput('timeoutSeconds') || '600'),
                 intervalSeconds: parseInt(core.getInput('intervalSeconds') || '10')
             });
@@ -126,6 +127,26 @@ const poll = (options) => __awaiter(void 0, void 0, void 0, function* () {
     };
 });
 exports.poll = poll;
+
+
+/***/ }),
+
+/***/ 4235:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveSha = void 0;
+const resolveSha = (context) => {
+    var _a, _b, _c;
+    let sha = context.sha;
+    if (context.eventName === 'pull_request') {
+        sha = (_c = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.head) === null || _c === void 0 ? void 0 : _c.sha;
+    }
+    return sha;
+};
+exports.resolveSha = resolveSha;
 
 
 /***/ }),

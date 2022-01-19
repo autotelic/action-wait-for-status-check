@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {poll} from './poll'
+import {resolveSha} from './resolve-sha'
 
 async function run(): Promise<void> {
   try {
@@ -20,7 +21,7 @@ async function run(): Promise<void> {
       statusName: core.getInput('statusName', {required: true}),
       owner: core.getInput('owner') || context.repo.owner,
       repo: core.getInput('repo') || context.repo.repo,
-      ref: core.getInput('ref') || context.sha,
+      ref: core.getInput('ref') || resolveSha(context),
 
       timeoutSeconds: parseInt(core.getInput('timeoutSeconds') || '600'),
       intervalSeconds: parseInt(core.getInput('intervalSeconds') || '10')
