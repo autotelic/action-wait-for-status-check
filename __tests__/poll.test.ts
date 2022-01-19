@@ -9,8 +9,6 @@ const client = {
   }
 }
 
-// jest.fn<ReturnType<typeof add>, Parameters<typeof add>>()
-
 const run = () =>
   poll({
     client: client as any,
