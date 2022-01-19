@@ -5,5 +5,10 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest'
   },
-  verbose: true
+  verbose: true,
+  collectCoverageFrom: [
+    "**/*.ts",
+    "!**/node_modules/**",
+    "!**/vendor/**"
+  ]
 }
