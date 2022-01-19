@@ -60,7 +60,7 @@ The Git ref of the commit you want to poll for a passing status check.
 
 **Default context source: `github.sha`** 
 
-Note: If working with a Pull Request Event, you may want to use the `github.pull_request.head.sha` context property instead.
+Note: If the action is used in a Workflow triggered by a `pull_request` event, the `github.pull_request.head.sha` context property will be used instead.
 
 ### repo
 
