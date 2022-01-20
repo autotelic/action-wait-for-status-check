@@ -16,7 +16,7 @@ This action retrieves Commit status checks only using the [GitHub Repository API
 
 ```yaml
     steps:
-      - uses: autotelic/action-wait-for-status-check@feat/initial-implementation
+      - uses: autotelic/action-wait-for-status-check@v1
         id: wait-for-status
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
