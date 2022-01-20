@@ -1,6 +1,6 @@
 {
   "name": "@autotelic/action-wait-for-status-check",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "private": true,
   "description": "A GitHub action that waits for a specified GitHub status check to complete",
   "main": "lib/main.js",
