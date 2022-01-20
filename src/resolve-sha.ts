@@ -1,4 +1,4 @@
-import {Context} from '@actions/github/lib/context'
+import { Context } from '@actions/github/lib/context'
 
 export const resolveSha = (context: Context): string => {
   return context.eventName === 'pull_request'

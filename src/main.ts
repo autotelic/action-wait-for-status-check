@@ -1,13 +1,13 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {poll} from './poll'
-import {resolveSha} from './resolve-sha'
+import { poll } from './poll'
+import { resolveSha } from './resolve-sha'
 
 async function run(): Promise<void> {
   try {
     const context = github.context
 
-    const token = core.getInput('token', {required: true})
+    const token = core.getInput('token', { required: true })
 
     const {
       context: statusContext,
@@ -18,7 +18,7 @@ async function run(): Promise<void> {
       client: github.getOctokit(token),
       log: msg => core.info(msg),
 
-      statusName: core.getInput('statusName', {required: true}),
+      statusName: core.getInput('statusName', { required: true }),
       owner: core.getInput('owner') || context.repo.owner,
       repo: core.getInput('repo') || context.repo.repo,
       ref: core.getInput('ref') || resolveSha(context),

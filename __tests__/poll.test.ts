@@ -1,5 +1,5 @@
-import {poll} from '../src/poll'
-import {jest, expect, test} from '@jest/globals'
+import { poll } from '../src/poll'
+import { jest, expect, test } from '@jest/globals'
 
 const client = {
   rest: {
@@ -121,5 +121,5 @@ test(`returns a state of 'timed_out' if a matching status check is not found by 
   })
 
   const result = await run()
-  expect(result).toEqual({state: 'timed_out'})
+  expect(result).toEqual({ state: 'timed_out' })
 })

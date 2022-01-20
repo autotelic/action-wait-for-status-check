@@ -1,5 +1,5 @@
-import {GitHub} from '@actions/github/lib/utils'
-import {wait} from './wait'
+import { GitHub } from '@actions/github/lib/utils'
+import { wait } from './wait'
 
 export interface Options {
   client: InstanceType<typeof GitHub>
@@ -40,7 +40,7 @@ export const poll = async (options: Options): Promise<CommitStatusValues> => {
 
     // https://docs.github.com/en/rest/reference/commits#get-the-combined-status-for-a-specific-reference
     const {
-      data: {statuses}
+      data: { statuses }
     } = await client.rest.repos.getCombinedStatusForRef({
       owner,
       repo,

@@ -1,9 +1,9 @@
-import {resolveSha} from '../src/resolve-sha'
-import {expect, test} from '@jest/globals'
+import { resolveSha } from '../src/resolve-sha'
+import { expect, test } from '@jest/globals'
 
-import {Context} from '@actions/github/lib/context'
+import { Context } from '@actions/github/lib/context'
 
-type RecursivePartial<T> = {[P in keyof T]?: T[P] | RecursivePartial<T[P]>}
+type RecursivePartial<T> = { [P in keyof T]?: T[P] | RecursivePartial<T[P]> }
 
 test('returns context.sha for non pull_request events', async () => {
   const testContext: RecursivePartial<Context> = {
