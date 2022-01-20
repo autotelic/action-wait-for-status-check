@@ -20,19 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set Commit Sha for Pull Request Event test
-        if: github.event_name == 'pull_request'
-        run: echo "test-sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
-      - name: Set Commit Sha for Push Event test
-        if: github.event_name == 'push'
-        run: echo "test-sha=${{ github.sha }}" >> $GITHUB_ENV
       - name: Run the current build of the action
         id: wait-for-status
         uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           statusName: "Test - Test Commit Status"
-          ref: ${{ env.test-sha }}
       - name: Echo Outputs
         run: |
          echo context: ${{ steps.wait-for-status.outputs.context }}

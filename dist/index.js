@@ -38,6 +38,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const poll_1 = __nccwpck_require__(5498);
+const resolve_sha_1 = __nccwpck_require__(4235);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -49,7 +50,7 @@ function run() {
                 statusName: core.getInput('statusName', { required: true }),
                 owner: core.getInput('owner') || context.repo.owner,
                 repo: core.getInput('repo') || context.repo.repo,
-                ref: core.getInput('ref') || context.sha,
+                ref: core.getInput('ref') || (0, resolve_sha_1.resolveSha)(context),
                 timeoutSeconds: parseInt(core.getInput('timeoutSeconds') || '600'),
                 intervalSeconds: parseInt(core.getInput('intervalSeconds') || '10')
             });
@@ -100,6 +101,7 @@ const poll = (options) => __awaiter(void 0, void 0, void 0, function* () {
     const deadline = now + timeoutSeconds * 1000;
     while (now <= deadline) {
         log(`Retrieving commit statuses on ${owner}/${repo}@${ref}...`);
+        // https://docs.github.com/en/rest/reference/commits#get-the-combined-status-for-a-specific-reference
         const { data: { statuses } } = yield client.rest.repos.getCombinedStatusForRef({
             owner,
             repo,
@@ -126,6 +128,24 @@ const poll = (options) => __awaiter(void 0, void 0, void 0, function* () {
     };
 });
 exports.poll = poll;
+
+
+/***/ }),
+
+/***/ 4235:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveSha = void 0;
+const resolveSha = (context) => {
+    var _a;
+    return context.eventName === 'pull_request'
+        ? ((_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.sha) || context.sha
+        : context.sha;
+};
+exports.resolveSha = resolveSha;
 
 
 /***/ }),
@@ -5608,9 +5628,17 @@ AbortError.prototype = Object.create(Error.prototype);
 AbortError.prototype.constructor = AbortError;
 AbortError.prototype.name = 'AbortError';
 
+const URL$1 = Url.URL || whatwgUrl.URL;
+
 // fix an issue where "PassThrough", "resolve" aren't a named export for node <10
 const PassThrough$1 = Stream.PassThrough;
-const resolve_url = Url.resolve;
+
+const isDomainOrSubdomain = function isDomainOrSubdomain(destination, original) {
+	const orig = new URL$1(original).hostname;
+	const dest = new URL$1(destination).hostname;
+
+	return orig === dest || orig[orig.length - dest.length - 1] === '.' && orig.endsWith(dest);
+};
 
 /**
  * Fetch function
@@ -5698,7 +5726,19 @@ function fetch(url, opts) {
 				const location = headers.get('Location');
 
 				// HTTP fetch step 5.3
-				const locationURL = location === null ? null : resolve_url(request.url, location);
+				let locationURL = null;
+				try {
+					locationURL = location === null ? null : new URL$1(location, request.url).toString();
+				} catch (err) {
+					// error here can only be invalid URL in Location: header
+					// do not throw when options.redirect == manual
+					// let the user extract the errorneous redirect URL
+					if (request.redirect !== 'manual') {
+						reject(new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, 'invalid-redirect'));
+						finalize();
+						return;
+					}
+				}
 
 				// HTTP fetch step 5.5
 				switch (request.redirect) {
@@ -5745,6 +5785,12 @@ function fetch(url, opts) {
 							timeout: request.timeout,
 							size: request.size
 						};
+
+						if (!isDomainOrSubdomain(request.url, locationURL)) {
+							for (const name of ['authorization', 'www-authenticate', 'cookie', 'cookie2']) {
+								requestOpts.headers.delete(name);
+							}
+						}
 
 						// HTTP-redirect fetch step 9
 						if (res.statusCode !== 303 && request.body && getTotalBytes(request) === null) {
