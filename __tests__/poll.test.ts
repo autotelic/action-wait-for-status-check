@@ -4,7 +4,7 @@ import { jest, expect, test } from '@jest/globals'
 const client = {
   rest: {
     repos: {
-      getCombinedStatusForRef: jest.fn<ReturnType<any>, Parameters<any>>()
+      getCombinedStatusForRef: jest.fn<ReturnType<any>>()
     }
   }
 }
